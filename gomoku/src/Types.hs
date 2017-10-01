@@ -1,7 +1,5 @@
 module Types where
 
-import Prelude hiding ((!!))
-
 import qualified Data.List
 import qualified Data.Maybe as M
 
