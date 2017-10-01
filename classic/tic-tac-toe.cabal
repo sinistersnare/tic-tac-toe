@@ -16,8 +16,8 @@ executable tic-tac-toe
   other-modules:       Checks,
                        Types,
                        Misc,
-                       Player.Computer, 
-                       Player.Human, 
+                       Player.Computer,
+                       Player.Human,
                        Player.MinMax,
                        Player.BestNext
 

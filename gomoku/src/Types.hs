@@ -1,35 +1,35 @@
-module Types where 
+module Types where
 
 import Prelude hiding ((!!))
 
-import qualified Data.List 
-import qualified Data.Maybe as M 
+import qualified Data.List
+import qualified Data.Maybe as M
 
 -------------------------------------------------------------------------------
 --- Board ---------------------------------------------------------------------
 -------------------------------------------------------------------------------
 
 
-data Tile = EmptyTile | X | O 
+data Tile = EmptyTile | X | O
   deriving (Eq)
 
 flipTile :: Tile -> Tile
-flipTile X = O 
-flipTile O = X 
+flipTile X = O
+flipTile O = X
 flipTile _ = EmptyTile
 
 type Move   = (Int,Int)
 
-type Board  = [(Move, Tile)] 
+type Board  = [(Move, Tile)]
 
 data Dimentions = Dim {dimN :: Int, dimM :: Int, dimK :: Int}
 
 dim :: Dimentions
-dim = Dim 15 15 5 
+dim = Dim 15 15 5
 
 
 (??) :: Board -> Move -> Tile
-b??ij = M.fromMaybe EmptyTile (lookup ij b) 
+b??ij = M.fromMaybe EmptyTile (lookup ij b)
 
 emptyBoard :: Board
 emptyBoard = [((x,y), EmptyTile) | x <- [1..(dimN dim)], y <- [1..(dimM dim)]]
@@ -42,17 +42,17 @@ put b t move = M.fromJust $ putMaybe b t move
 
 putMaybe :: Board -> Tile -> Move -> Maybe Board
 putMaybe b t xy = case b??xy of
-               EmptyTile -> Just $ map (\(ij,tij) -> if ij == xy then (ij,t) else (ij,tij)) b 
+               EmptyTile -> Just $ map (\(ij,tij) -> if ij == xy then (ij,t) else (ij,tij)) b
                _         -> Nothing
 
 -------------------------------------------------------------------------------
 --- Player --------------------------------------------------------------------
 -------------------------------------------------------------------------------
 
-data Player = 
+data Player =
   Player { playerMove :: Tile -> Board -> IO Move
          , playerName :: String
-         } 
+         }
 
 -------------------------------------------------------------------------------
 --- Score ---------------------------------------------------------------------
@@ -62,17 +62,17 @@ type Score = [(PlayerInfo, Int)]
 
 showFinalScore :: Score -> String
 showFinalScore [(p1,i1),(p2,i2)]
-  = if i1 == i2 
-      then "Its a tie!" 
+  = if i1 == i2
+      then "Its a tie!"
       else ("The winner is " ++ show (if i1 < i2 then p2 else p1))
 
-showScore [(p1,i1),(p2,i2)] 
-  = show p1 ++ " : " ++ show i1 ++ " VS. " ++ show p2 ++ " : " ++ show i2 
-showScore _ 
+showScore [(p1,i1),(p2,i2)]
+  = show p1 ++ " : " ++ show i1 ++ " VS. " ++ show p2 ++ " : " ++ show i2
+showScore _
   = ""
 
 incr :: PlayerInfo -> Score -> Score
-incr pi xs = map (\(pj,sj) -> if pi == pj then (pj,sj+1) else (pj,sj)) xs 
+incr pi xs = map (\(pj,sj) -> if pi == pj then (pj,sj+1) else (pj,sj)) xs
 
 -------------------------------------------------------------------------------
 --- Result --------------------------------------------------------------------
@@ -84,7 +84,7 @@ data Result = TimeOut PlayerInfo PlayerInfo | Wins Winner | Tie  | Invalid Playe
 --- Player Info ---------------------------------------------------------------
 -------------------------------------------------------------------------------
 
-data PlayerInfo =  
+data PlayerInfo =
   PI { playerInfoPlayer :: Player
      , playerInfoTile   :: Tile
      , playerInfoInt    :: Int
@@ -93,17 +93,17 @@ data PlayerInfo =
 type Winner = PlayerInfo
 
 instance Eq PlayerInfo where
-    p1 == p2 = playerInfoInt p1 == playerInfoInt p2 
+    p1 == p2 = playerInfoInt p1 == playerInfoInt p2
 
 instance Show Player where
   show = playerName
 
 instance Show PlayerInfo where
-  show pi 
+  show pi
     | pname /= "Computer" && pname /= "Human"
-    =  pname 
-    | otherwise 
-    = "Player " ++ show (playerInfoInt pi) 
+    =  pname
+    | otherwise
+    = "Player " ++ show (playerInfoInt pi)
     where pname = playerName $ playerInfoPlayer pi
 
 

@@ -1,12 +1,12 @@
-module Player.Computer (playerComputer) where 
+module Player.Computer (playerComputer) where
 
 import System.Random (randomRIO)
 import Prelude hiding ((!!))
 
-import Types 
+import Types
 
 playerComputer :: Player
-playerComputer = Player getRandomMove "Computer" 
+playerComputer = Player getRandomMove "Computer"
 
 
 getRandomMove :: Tile -> Board -> IO (Int, Int)
