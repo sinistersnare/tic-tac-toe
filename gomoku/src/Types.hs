@@ -25,7 +25,6 @@ data Dimentions = Dim {dimN :: Int, dimM :: Int, dimK :: Int}
 dim :: Dimentions
 dim = Dim 15 15 5
 
-
 (??) :: Board -> Move -> Tile
 b??ij = M.fromMaybe EmptyTile (lookup ij b)
 
@@ -109,7 +108,6 @@ instance Show Tile where
   show EmptyTile = "     "
   show X         = "  X  "
   show O         = "  O  "
-
 
 showBoard :: Board -> String
 showBoard b = let blist = boardAsList b

@@ -6,7 +6,7 @@ author:              nikivazou
 maintainer:          nikivazou@gmail.com
 category:            Game
 build-type:          Simple
-extra-source-files:  ChangeLog.md, README.md
+extra-source-files:  ChangeLog.md
 cabal-version:       >=1.10
 
 executable gomoku
