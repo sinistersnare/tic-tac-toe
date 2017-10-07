@@ -1,7 +1,6 @@
 module Player.Computer (playerComputer) where 
 
 import System.Random (randomRIO)
-import Prelude hiding ((!!))
 
 import Types 
 
