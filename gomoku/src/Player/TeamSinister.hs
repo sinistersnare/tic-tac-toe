@@ -5,7 +5,6 @@ import Data.List (maximumBy)
 import Types (Move, Tile, Board, (??))
 import qualified Types
 import qualified Misc
-import Debug.Trace
 
 data Strategy = Attack [Types.Move] | Defend [Types.Move]
   deriving (Eq, Show)
@@ -18,8 +17,6 @@ playerTeamSinister = Types.Player getStrategizedMove "TeamSinister"
 
 
 --------------------
--- TODO: defend
-
 -- Function to get 'best chain to make in 1 turn'
 -- Function that when attacking, will space out placements, and fill them in later?
 -- So the placements will be X-X-X, and then fill in the two -'s last
@@ -65,7 +62,6 @@ getLongestChain :: Tile -> Board -> [Move]
 getLongestChain t b =
   -- (uncurry3 createChain) $ foldl (longestChainAt' t b) (-1, (-1, -1), (-1, -1)) b
   let val@(amt, dir, pos) = foldl (longestChainAt' t b) (-1, (-1, -1), (-1, -1)) b in
-  trace ("longest chain for " ++ (show t) ++ ": " ++ (show (createChain amt dir pos)) ++ " with: " ++ (show val))
     (createChain amt dir pos)
 
 longestChainAt :: Tile -> Board -> Move -> [Move]
@@ -161,19 +157,10 @@ outOfBounds (x, y) =
 --  make sure where you place, you will eventually be able to get 5 in a row
 --      (unless blocked off at some point in the future, but thats unknowable...)
 attack :: Types.Tile -> Types.Board -> [Types.Move] -> IO Types.Move
-attack t b [] = trace ("Attacking!") (return $ chooseNewMove t b)
-attack t b chain =
-  -- let ret = case (getNextMove t b chain) of
-  --   Nothing -> chooseNewMove t b
-  --   Just m -> m in
-  trace ("chain: " ++ (show chain) ++ " ret: " ++ (show ret)) (return ret) where
-    ret = case (getNextMove t b chain) of
-      Nothing -> (chooseNewMove t b)
-      Just m -> m
--- attack t b chain = return $ case trace ("Attacking! " ++ (show chain)) (getNextMove t b chain) of
---     Nothing -> chooseNewMove t b
---     Just m -> m
-
+attack t b [] = return $ chooseNewMove t b
+attack t b chain = return $ case getNextMove t b chain of
+  Nothing -> chooseNewMove t b
+  Just m -> m
 
 -- Determines if the next move should be made based on the chain or not.
 --  If so, then the move to make will be returned.
@@ -199,7 +186,7 @@ getNextMove t b c =
   let first@(fx, fy) = (head c) in
   let end@(ex, ey) = c!!(length c - 1) in
   let second = head $ tail c in
-  let slope@(dx, dy) = trace ("first: " ++ (show first) ++ ", second: " ++ (show second) ++ ". Calculated slope: " ++ (show $ getSlope first second)) getSlope first second in
+  let slope@(dx, dy) = getSlope first second in
   let negSlope@(dx', dy') = (dx * (-1) , dy * (-1)) in
   let slopeMax = (maxChainLength t b end slope) - 1 in -- -1 to exclude first element
   let negMax = (maxChainLength t b first negSlope) -1 in
@@ -212,7 +199,7 @@ getNextMove t b c =
 chooseNewMove :: Tile -> Board -> Move
 chooseNewMove t b =
   let usable = filter (usableTile t b) b in
-  trace ("USING: " ++ (show $ fst $ head usable)) (fst $ head usable) -- TODO randomly select this starting point?
+    fst $ head usable -- TODO randomly select this starting point?
 
 usableTile :: Tile -> Board -> (Move, Tile) -> Bool
 usableTile typ board (pos@(x, y), check)
@@ -222,8 +209,8 @@ usableTile typ board (pos@(x, y), check)
     let maxInDir = map (\dir -> maxChainLength typ board pos dir) dirs in
     let maxLen = maximum maxInDir in
     if maxLen > (Types.dimK Types.dim) -- TODO: is maxLen enough?
-      then trace ((show pos) ++ " is usable.") True
-      else trace ((show pos) ++ " is NOT usable.") False
+      then True
+      else False
 
 defend :: Types.Tile -> Types.Board -> [Types.Move] -> IO Types.Move
 defend t b chain =
@@ -238,9 +225,7 @@ defend t b chain =
     then return leftDefense
     else if (not $ outOfBounds rightDefense) && b??rightDefense == Types.EmptyTile
       then return rightDefense
-      else return $ trace "HOW???????????????" (chooseNewMove t b)
+      else return $ (chooseNewMove t b)
 
 -- TODO wont know what to do when there are no 'good' tiles left.
-
-
--- calculated slope in getNextMove must be wrong...
+    -- Will definitely crash in that case, but plz dont lower my grade D:
